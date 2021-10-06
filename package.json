@@ -1,0 +1,16 @@
+{
+  "name": "appcues",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "author": "Mario Ruiz Diaz",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "express-prom-bundle": "^6.4.1",
+    "prom-client": "^14.0.0"
+  }
+}
