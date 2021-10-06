@@ -3,14 +3,41 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
-    "start": "node src/index.js"
+    "test": "xo",
+    "lint": "xo",
+    "format": "xo --fix",
+    "start": "node ./bin/start.js",
+    "dev": "nodemon ./bin/start.js",
+    "migrate": "node ./bin/migrate.js",
+    "migrate:create": "migrate create --migrations-dir='./src/migrations'",
+    "docker:start": "docker-compose down && docker-compose up -d"
   },
   "author": "Mario Ruiz Diaz",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.0.1",
+    "client-sessions": "^0.8.0",
     "express": "^4.17.1",
     "express-prom-bundle": "^6.4.1",
-    "prom-client": "^14.0.0"
+    "migrate": "^1.7.0",
+    "morgan": "^1.10.0",
+    "pg": "^8.7.1",
+    "prom-client": "^14.0.0",
+    "sql-template-strings": "^2.2.2",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.13",
+    "xo": "^0.45.0"
+  },
+  "engines": {
+    "node": ">=12.22.0",
+    "npm": ">=6.0.0"
+  },
+  "xo": {
+    "prettier": true,
+    "space": true
   }
 }
