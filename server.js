@@ -1,20 +1,24 @@
-import express, {json} from 'express';
+import express, { json } from 'express';
 import promBundle from 'express-prom-bundle';
 
 import morgan from 'morgan';
 import clientSession from 'client-sessions';
 
-import {SESSION_SECRET} from './config.js';
+import { SESSION_SECRET } from './config.js';
 import api from './src/api/index.js';
+import { init as initRedis } from './src/persistence/cache/redis.js'
 
 const app = express();
 const metricsMiddleware = promBundle({
     includeMethod: true,
     normalizePath: false,
     includePath: true,
-    customLabels: {projectName: 'appcues', author: 'Mario Ruiz Diaz'},
-  });
-  
+    customLabels: {
+        projectName: 'appcues',
+        author: 'Mario Ruiz Diaz'
+    },
+});
+
 app.use(metricsMiddleware);
 
 app.get('/', (request, response) => response.sendStatus(200));
@@ -23,23 +27,24 @@ app.get('/health', (request, response) => response.status(200).send("Appcues is 
 app.use(morgan('short'));
 app.use(json());
 app.use(
-  clientSession({
-    cookieName: 'session',
-    secret: SESSION_SECRET,
-    duration: 24 * 60 * 60 * 1000,
-  }),
+    clientSession({
+        cookieName: 'session',
+        secret: SESSION_SECRET,
+        duration: 24 * 60 * 60 * 1000,
+    }),
 );
 
 app.use(api);
 
 let server;
 export function start(port) {
-  server = app.listen(port, () => {
-    console.log(`App started on port ${port}`);
-  });
-  return app;
+    initRedis(process.env.REDIS_HOST, process.env.REDIS_PORT);
+    server = app.listen(port, () => {
+        console.log(`App started on port ${port}`);
+    });
+    return app;
 }
 
 export function stop() {
-  server.close();
+    server.close();
 }

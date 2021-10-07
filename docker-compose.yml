@@ -9,6 +9,14 @@ volumes:
     grafana_data: {}
 
 services:
+  appcues-redis:
+    container_name: appcues-redis
+    image: redis:latest
+    networks:
+      - appcues-net
+    ports:
+      - "6379:6379"
+
   postgres:
     image: postgres:10.4
     ports:
@@ -32,6 +40,9 @@ services:
       DATABASE_URL: postgres://user:pass@postgres:5432/db
       NODE_ENV: development
       PORT: 3333
+      REDIS_HOST: appcues-redis
+      REDIS_PORT: 6379
+      REDIS_CACHE_EXPIRATION_SECS: 10
     command: yarn start
     ports:
       - "3333:3333"
