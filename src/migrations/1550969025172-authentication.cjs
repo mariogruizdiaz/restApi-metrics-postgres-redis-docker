@@ -14,12 +14,20 @@ module.exports.up = async function (next) {
     id uuid PRIMARY KEY,
     user_id uuid REFERENCES users (id) ON DELETE CASCADE
   );
+
+  CREATE TABLE IF NOT EXISTS keys (
+    id uuid PRIMARY KEY,
+    key_name text UNIQUE,
+    key_value integer NOT NULL
+  );
   `);
 
   await client.query(`
   CREATE INDEX users_email on users (email);
 
   CREATE INDEX sessions_user on sessions (user_id);
+
+  CREATE INDEX keys_keyname on keys (key_name);
   `);
 
   await client.release(true);

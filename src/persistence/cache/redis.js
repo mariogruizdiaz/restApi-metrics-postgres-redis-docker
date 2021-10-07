@@ -1,9 +1,9 @@
-import { createClient } from 'redis';
+import asyncRedis from "async-redis";
 
 let client;
 
 export async function init(host, port) {
-    client = createClient({
+    client = asyncRedis.createClient({
         host,
         port
     });
@@ -17,10 +17,20 @@ export async function init(host, port) {
 }
 
 export async function incrementBy(key, incrementAmount) {
-    if (!await client.get(key)) {
+    let value = await client.get(key);
+    if (!value) {
         await client.setex(key, process.env.REDIS_CACHE_EXPIRATION_SECS || 10, incrementAmount);
+        return incrementAmount;
     } else {
         await client.incrby(key, incrementAmount);
+        return Number.parseInt(value) + incrementAmount;
     }
-    return;
+}
+
+export async function find(key) {
+    return await client.get(key);
+}
+
+export async function setEx(key, expireSeconds, value) {
+    return await client.setex(key, expireSeconds, value);
 }
