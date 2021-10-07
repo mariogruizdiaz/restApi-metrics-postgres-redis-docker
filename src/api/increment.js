@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { incrementBy, find as findKeyInCache, setEx } from '../persistence/cache/redis.js';
+import { incrementBy, get as findKeyInCache, setEx, set, SHADOW_KEY } from '../persistence/cache/redis.js';
 import { find as findKeyInDb } from '../persistence/keys.js';
 
 const router = new Router();
@@ -14,7 +14,8 @@ router.post('/', async (request, response) => {
                 .json({ message: 'key and value must be provided' });
         }
 
-        if (Number.isNaN(value)) {
+        const formatedValue = Number.parseInt(value.toString());
+        if (Number.isNaN(formatedValue)) {
             return response
                 .status(400)
                 .json({ message: 'The value must be a number' });
@@ -22,12 +23,12 @@ router.post('/', async (request, response) => {
 
         let currentValue = await findKeyInCache(key);
         if (currentValue){
-            return response.status(200).json({ newValue: await incrementBy(key, value) });
+            return response.status(200).json({ newValue: await incrementBy(key, formatedValue) });
         } else {
             currentValue = await findKeyInDb(key);
-            let newValue = currentValue? currentValue + value : value;
-            await setEx(key, process.env.REDIS_CACHE_EXPIRATION_SECS || 10, newValue);
-            // subcribe to the key
+            let newValue = currentValue? currentValue + formatedValue : formatedValue;
+            await set(key, newValue);
+            await setEx(`${key}${SHADOW_KEY}`, process.env.REDIS_CACHE_EXPIRATION_SECS || 10, "");
             return response.status(200).json({ newValue });
         }
     } catch (error) {

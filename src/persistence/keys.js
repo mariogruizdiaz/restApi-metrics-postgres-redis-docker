@@ -28,3 +28,7 @@ export async function deleteKey(id) {
     DELETE FROM keys WHERE id = ${id};
     `);
 }
+
+export function keyExpirationHandler(channel, expiredKey, value) {
+    console.log(`The key '${expiredKey}' with the value ${value} expired!`);
+}

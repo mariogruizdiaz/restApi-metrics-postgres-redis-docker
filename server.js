@@ -6,7 +6,8 @@ import clientSession from 'client-sessions';
 
 import { SESSION_SECRET } from './config.js';
 import api from './src/api/index.js';
-import { init as initRedis } from './src/persistence/cache/redis.js'
+import { init as initRedis } from './src/persistence/cache/redis.js';
+import { keyExpirationHandler } from './src/persistence/keys.js';
 
 const app = express();
 const metricsMiddleware = promBundle({
@@ -38,7 +39,7 @@ app.use(api);
 
 let server;
 export function start(port) {
-    initRedis(process.env.REDIS_HOST, process.env.REDIS_PORT);
+    initRedis(process.env.REDIS_HOST, process.env.REDIS_PORT, keyExpirationHandler);
     server = app.listen(port, () => {
         console.log(`App started on port ${port}`);
     });
