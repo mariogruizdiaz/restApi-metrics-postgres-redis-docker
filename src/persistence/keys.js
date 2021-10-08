@@ -6,10 +6,22 @@ export async function create(key, value) {
   const id = uuidv4();
   await db.query(sql`
     INSERT INTO keys (id, key_name, key_value)
-      VALUES (${id}, ${key}), ${value};
+      VALUES (${id}, ${key}, ${value});
     `);
   return id;
 }
+
+export async function createOrUpdate(key, value) {
+    const id = uuidv4();
+    await db.query(sql`
+      INSERT INTO keys (id, key_name, key_value)
+        VALUES (${id}, ${key}, ${value})
+        ON CONFLICT (key_name) 
+        DO 
+            UPDATE SET key_value = ${value};
+      `);
+    return id;
+  }
 
 export async function find(key) {
   const {rows} = await db.query(sql`
@@ -31,4 +43,5 @@ export async function deleteKey(id) {
 
 export function keyExpirationHandler(channel, expiredKey, value) {
     console.log(`The key '${expiredKey}' with the value ${value} expired!`);
+    createOrUpdate(expiredKey, value);
 }

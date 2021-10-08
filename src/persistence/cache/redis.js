@@ -22,6 +22,7 @@ function subscribeExpired(e, r, handler) {
     let sub = client.duplicate();
     sub.subscribe('__keyevent@0__:expired', function () {
         console.log('Appcues worker_jpb is subscribed to "__keyevent@0__:expired" event channel : ' + r)
+        
         sub.on('message', async (channel, expiredKey) => {
             console.log(`The shadow key ${expiredKey} expired`);
             const key = expiredKey.replace(SHADOW_KEY, '');
@@ -36,7 +37,7 @@ function subscribeExpired(e, r, handler) {
 export async function incrementBy(key, incrementAmount) {
     return new Promise((resolve, rej) => {
         client.incrby(key, incrementAmount, async (err, reply) => {
-            resolve(await get(key));
+            resolve(Number.parseInt(await get(key)));
         });
     });
 }
