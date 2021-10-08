@@ -39,7 +39,7 @@ app.use(api);
 
 let server;
 export function start(port) {
-    initRedis(process.env.REDIS_HOST, process.env.REDIS_PORT, keyExpirationHandler);
+    initRedis(process.env.REDIS_HOST || 'localhost', process.env.REDIS_PORT || 6379, keyExpirationHandler);
     server = app.listen(port, () => {
         console.log(`App started on port ${port}`);
     });

@@ -1,10 +1,11 @@
 import { Router } from 'express';
 import { incrementBy, get as findKeyInCache, setEx, set, SHADOW_KEY } from '../persistence/cache/redis.js';
 import { find as findKeyInDb } from '../persistence/keys.js';
+import sessionMiddleware from '../middleware/session-middleware.js';
 
 const router = new Router();
 
-router.post('/', async (request, response) => {
+router.post('/', sessionMiddleware, async (request, response) => {
     const { key, value } = request.body;
     try {
 
